@@ -1,13 +1,13 @@
 import NavSection from "./components/Navbar";
-import useWeb3 from "./hooks/useWeb3";
+import Container from "react-bootstrap/Container";
+import LatestTxns from "./components/latestTxns";
 
 function App() {
-  useWeb3();
   return (
-    <main>
+    <Container fluid>
       <NavSection />
-      <p>Hello world</p>
-    </main>
+      <LatestTxns />
+    </Container>
   );
 }
 
