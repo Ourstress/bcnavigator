@@ -1,12 +1,13 @@
 import Container from "react-bootstrap/Container";
 import Card from "react-bootstrap/Card";
-import useWeb3 from "../hooks/useWeb3";
+import useLatestInfo from "../hooks/useLatestInfo";
 
 function LatestTxns() {
-  const latestBlock = useWeb3();
+  const latestBlock = useLatestInfo();
   return (
     <>
       <h3>Recent transactions</h3>
+      <p>Refreshed every 13s</p>
       <Container fluid className="card-columns">
         {latestBlock &&
           latestBlock.transactions &&
