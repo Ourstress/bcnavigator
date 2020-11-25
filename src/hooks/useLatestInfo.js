@@ -6,17 +6,19 @@ export default function useLatestInfo() {
   const [recentBlocks, setRecentBlocks] = useState([]);
   const web3 = useContext(Web3Context);
   useEffect(() => {
-    const getRecentBlocks = async function () {
+    const calcBlockNumbers = (latest) =>
+      Array.from(Array(10)).map((_, index) => {
+        index++;
+        return latest - index;
+      });
+
+    const getRecentBlocks = async () => {
       if (web3) {
         const latest = await web3.eth.getBlockNumber();
-        const blockNumbers = Array.from(Array(10)).map((_, index) => {
-          index++;
-          return latest - index;
-        });
-        const blocks = [];
+        const blockNumbers = calcBlockNumbers(latest);
         const addToBlock = function (err, result) {
           if (err) console.log(err);
-          blocks.push(result);
+          setRecentBlocks((prevState) => [...prevState, result]);
         };
         const batch = new web3.eth.BatchRequest();
         blockNumbers.forEach((blockNumber) => {
@@ -24,19 +26,23 @@ export default function useLatestInfo() {
         });
 
         batch.execute();
-        setRecentBlocks(blocks);
       } else {
         return [];
       }
     };
+    getRecentBlocks();
+  }, [web3]);
 
+  useEffect(() => {
     const getLatestTxns = () =>
       web3
-        ? web3.eth.getBlock("latest").then((block) => setLatestBlock(block))
+        ? web3.eth.getBlock("latest").then((block) => {
+            setRecentBlocks((prevState) => prevState.slice(1).concat([block]));
+            setLatestBlock(block);
+          })
         : {};
     getLatestTxns();
-    getRecentBlocks();
-    // setInterval to refresh latest block every 13s
+    // setInterval to refresh latest block every 15s
     const interval = setInterval(() => {
       getLatestTxns();
     }, 13000);
