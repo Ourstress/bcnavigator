@@ -7,7 +7,7 @@ export default function useLatestInfo() {
   const web3 = useContext(Web3Context);
   useEffect(() => {
     const calcBlockNumbers = (latest) =>
-      Array.from(Array(10)).map((_, index) => {
+      Array.from(Array(9)).map((_, index) => {
         index++;
         return latest - index;
       });
@@ -48,6 +48,5 @@ export default function useLatestInfo() {
     }, 13000);
     return () => clearInterval(interval);
   }, [web3]);
-  console.log("latestBlock", latestBlock);
   return [recentBlocks, latestBlock];
 }
