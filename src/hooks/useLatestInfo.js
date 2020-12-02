@@ -5,6 +5,7 @@ export default function useLatestInfo() {
   const [latestBlock, setLatestBlock] = useState({});
   const [recentBlocks, setRecentBlocks] = useState([]);
   const web3 = useContext(Web3Context);
+  // console.log("myweb3", web3.eth.getBlock());
   useEffect(() => {
     const calcBlockNumbers = (latest) =>
       Array.from(Array(9)).map((_, index) => {
