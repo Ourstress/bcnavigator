@@ -1,15 +1,19 @@
 import useLatestInfo from "./useLatestInfo";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import React from "react";
 import { Web3Context } from "./web3";
 
 const mockEth = {
   getBlock: (x) => Promise.resolve(x),
   getBlockNumber: jest.fn(),
-  BatchRequest: jest.fn(),
+  BatchRequest: class Batch {
+    constructor() {
+      this.add = jest.fn();
+      this.execute = jest.fn();
+    }
+  },
 };
-
-console.log("mockEth", mockEth.getBlock());
+mockEth.getBlock.request = jest.fn();
 
 const MockMyComponent = () => {
   const [recentBlocks, latestBlock] = useLatestInfo();
@@ -22,23 +26,23 @@ const MockComponentWithProvider = () => (
   </Web3Context.Provider>
 );
 
-test("useEffect called twice", () => {
+test("useEffect called twice", async () => {
   const mockUseEffect = jest.spyOn(React, "useEffect");
   render(<MockComponentWithProvider />);
-  expect(mockUseEffect).toHaveBeenCalledTimes(2);
+  await waitFor(() => expect(mockUseEffect).toHaveBeenCalledTimes(2));
   mockUseEffect.mockRestore();
 });
 
-test("call to eth.getBlock()", () => {
-  const mockEthSpy = jest.spyOn(mockEth, "getBlock");
+test("9 calls to eth.getBlock.request", async () => {
+  const mockEthGetBlockRequest = (mockEth.getBlock.request = jest.fn());
   render(<MockComponentWithProvider />);
-  expect(mockEthSpy).toHaveBeenCalledTimes(1);
-  mockEthSpy.mockRestore();
+  await waitFor(() => expect(mockEthGetBlockRequest).toHaveBeenCalledTimes(9));
+  mockEthGetBlockRequest.mockRestore();
 });
 
-test("useContext was called once", () => {
+test("useContext was called once", async () => {
   const mockUseContext = jest.spyOn(React, "useContext");
   render(<MockComponentWithProvider />);
-  expect(mockUseContext).toHaveBeenCalledTimes(1);
+  await waitFor(() => expect(mockUseContext).toHaveBeenCalledTimes(1));
   mockUseContext.mockRestore();
 });
